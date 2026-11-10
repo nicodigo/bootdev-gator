@@ -60,5 +60,6 @@ func loadCommands() *commands {
 	cmds.register("register", handlerRegister)
 	cmds.register("reset", handlerReset)
 	cmds.register("users", handlerUsers)
+	cmds.register("agg", handleAgg)
 	return &cmds
 }
