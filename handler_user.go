@@ -38,10 +38,10 @@ func handlerRegister(s *state, cmd command) error {
 	username := cmd.arguments[0]
 
 	newUser := database.CreateUserParams{
-		ID: uuid.New(),
+		ID:        uuid.New(),
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
-		Name: username,
+		Name:      username,
 	}
 
 	currUser, err := s.db.CreateUser(context.Background(), newUser)
@@ -56,5 +56,13 @@ func handlerRegister(s *state, cmd command) error {
 	fmt.Println("ID:", currUser.ID)
 	fmt.Println("Created at:", currUser.CreatedAt)
 	fmt.Println("Updated at:", currUser.UpdatedAt)
+	return nil
+}
+
+func handlerReset(s *state, cmd command) error {
+	if err := s.db.DeleteUsers(context.Background()); err != nil {
+		return err
+	}
+	fmt.Println("All users have been deleted!")
 	return nil
 }
