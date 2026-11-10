@@ -1,0 +1,19 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: postgres-gator
+    ports:
+      - "5432:5432"
+    env_file:
+      - .env
+    volumes:
+      - pg_gator:/var/lib/postgresql/data:rw
+    healthcheck:
+      test: [ "CMD-SHELL", 'pg_isready -U "$${POSTGRES_USER}" -d "$${POSTGRES_DB}" -h localhost || exit 1' ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+volumes:
+  pg_gator:
