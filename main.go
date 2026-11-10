@@ -1,14 +1,19 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"os"
 
 	"github.com/nicodigo/blog-aggregator/internal/config"
+	"github.com/nicodigo/blog-aggregator/internal/database"
+
+	_ "github.com/lib/pq"
 )
 
 type state struct {
 	cfg *config.Config
+	db *database.Queries
 }
 
 func main() {
@@ -20,6 +25,14 @@ func main() {
 
 	programState := state{cfg: myConfig}
 	cmds := loadCommands()
+
+	db, err := sql.Open("postgres", myConfig.DbURL)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error opening database: %v\n", err)
+		os.Exit(1)
+	}
+
+	programState.db = database.New(db)
 
 	if len(os.Args) < 2 {
 		fmt.Fprintln(os.Stderr, "usage: <command name> [args]")
@@ -44,5 +57,6 @@ func loadCommands() *commands {
 		cmdHandlers: make(map[string]func(*state, command) error),
 	}
 	cmds.register("login", handlerLogin)
+	cmds.register("register", handlerRegister)
 	return &cmds
 }
