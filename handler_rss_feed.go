@@ -47,7 +47,8 @@ func handleAddFeed(s *state, cmd command) error {
 
 	fmt.Println("Feed added to the database:")
 	printFeedInfo(addedFeed, currUser)
-	return nil
+
+	return createFeedFollows(s, currUser, addedFeed)
 }
 
 func handleFeeds(s *state, cmd command) error {
