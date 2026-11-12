@@ -19,17 +19,12 @@ func handleAgg(s *state, cmd command) error {
 	return nil
 }
 
-func handleAddFeed(s *state, cmd command) error {
+func handleAddFeed(s *state, cmd command, user database.User) error {
 	if len(cmd.arguments) != 2 {
 		return fmt.Errorf("Usage: addfeed <name> <url>")
 	}
 	feedName := cmd.arguments[0]
 	feedUrl := cmd.arguments[1]
-
-	currUser, err := s.db.GetUser(context.Background(), s.cfg.CurrentUserName)
-	if err != nil {
-		return err
-	}
 
 	newFeed := database.CreateFeedParams{
 		ID:        uuid.New(),
@@ -37,7 +32,7 @@ func handleAddFeed(s *state, cmd command) error {
 		UpdatedAt: time.Now(),
 		Name:      feedName,
 		Url:       feedUrl,
-		UserID:    currUser.ID,
+		UserID:    user.ID,
 	}
 
 	addedFeed, err := s.db.CreateFeed(context.Background(), newFeed)
@@ -46,9 +41,9 @@ func handleAddFeed(s *state, cmd command) error {
 	}
 
 	fmt.Println("Feed added to the database:")
-	printFeedInfo(addedFeed, currUser)
+	printFeedInfo(addedFeed, user)
 
-	return createFeedFollows(s, currUser, addedFeed)
+	return createFeedFollows(s, user, addedFeed)
 }
 
 func handleFeeds(s *state, cmd command) error {
