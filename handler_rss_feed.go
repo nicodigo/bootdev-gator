@@ -10,13 +10,24 @@ import (
 )
 
 func handleAgg(s *state, cmd command) error {
-	feed, err := fetchFeed(context.Background(), "https://www.wagslane.dev/index.xml")
+	if len(cmd.arguments) != 1 {
+		return fmt.Errorf("Usage: agg <time interval>")
+	}
+
+	interval, err := time.ParseDuration(cmd.arguments[0])
 	if err != nil {
 		return err
 	}
 
-	fmt.Printf("%+v\n", *feed)
-	return nil
+	fmt.Printf("Collecting feeds every %s\n", cmd.arguments[0])
+
+	ticker := time.NewTicker(interval)
+	for ; ; <-ticker.C {
+		fmt.Println("New feed fetched!")
+		fmt.Println()
+		scrapeFeeds(s)
+		fmt.Println()
+	}
 }
 
 func handleAddFeed(s *state, cmd command, user database.User) error {
